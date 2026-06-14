@@ -35,15 +35,36 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      Future.delayed(const Duration(milliseconds: 150), () {
+    if (!_scrollController.hasClients) return;
+
+    // Phase 1: Scroll immediately to the current bottom
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+    );
+
+    // Phase 2: Scroll again after layout settles to account for dynamic card heights
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
         );
-      });
-    }
+      }
+    });
+
+    // Phase 3: Final check scroll after animations settle
+    Future.delayed(const Duration(milliseconds: 700), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void _sendMessage() {
