@@ -24,10 +24,17 @@ class _ProgressChartBubbleState extends ConsumerState<ProgressChartBubble> {
   int _selectedPointIndex = -1;
   bool _isBarChart = false;
   final _newValueController = TextEditingController();
+  String? _selectedDay;
 
   @override
   void initState() {
     super.initState();
+    
+    // Default to the current day of the week
+    final dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    final currentDayIndex = DateTime.now().weekday - 1;
+    _selectedDay = dayNames[currentDayIndex.clamp(0, 6)];
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(widgetStateNotifierProvider(widget.widgetId).notifier)
@@ -170,6 +177,41 @@ class _ProgressChartBubbleState extends ConsumerState<ProgressChartBubble> {
           // Quick entry logger row
           Row(
             children: [
+              // Day of the week dropdown
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceCard,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border, width: 1),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedDay,
+                    dropdownColor: AppColors.surface,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    items: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                        .map((String day) {
+                      return DropdownMenuItem<String>(
+                        value: day,
+                        child: Text(day),
+                      );
+                    }).toList(),
+                    onChanged: (String? val) {
+                      if (val != null) {
+                        setState(() {
+                          _selectedDay = val;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               Expanded(
                 child: TextField(
                   controller: _newValueController,
@@ -177,7 +219,7 @@ class _ProgressChartBubbleState extends ConsumerState<ProgressChartBubble> {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Add new log ($unit)...',
+                    hintText: 'Log ($unit)...',
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -216,25 +258,37 @@ class _ProgressChartBubbleState extends ConsumerState<ProgressChartBubble> {
           (current['values'] as List).map((e) => (e as num).toDouble()),
         );
 
-        // Figure out next day name
         final dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        String nextDay = "Mon";
-        if (labels.isNotEmpty) {
-          final lastDay = labels.last;
-          final idx = dayNames.indexOf(lastDay);
-          if (idx != -1) {
-            nextDay = dayNames[(idx + 1) % dayNames.length];
+        
+        // Check if the selected day already has a log entry
+        final index = labels.indexOf(_selectedDay ?? 'Mon');
+        if (index != -1) {
+          // Update the existing entry
+          values[index] = val;
+        } else {
+          // If the list is full (7 days), remove the first one to keep 7 slots
+          if (labels.length >= 7) {
+            labels.removeAt(0);
+            values.removeAt(0);
+          }
+          
+          labels.add(_selectedDay ?? 'Mon');
+          values.add(val);
+
+          // Chronologically sort labels and values according to weekly day order
+          final List<MapEntry<String, double>> paired = List.generate(
+            labels.length,
+            (i) => MapEntry(labels[i], values[i]),
+          );
+          paired.sort((a, b) => dayNames.indexOf(a.key).compareTo(dayNames.indexOf(b.key)));
+
+          labels.clear();
+          values.clear();
+          for (final entry in paired) {
+            labels.add(entry.key);
+            values.add(entry.value);
           }
         }
-
-        // Maintain max 7 items to keep chart neat
-        if (labels.length >= 7) {
-          labels.removeAt(0);
-          values.removeAt(0);
-        }
-
-        labels.add(nextDay);
-        values.add(val);
 
         return {...current, 'labels': labels, 'values': values};
       },
