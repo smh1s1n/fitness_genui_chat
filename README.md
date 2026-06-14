@@ -124,9 +124,10 @@ flutter analyze
 
 ---
 
-## License
+## 📄 License
 
-This project is proprietary and confidential. All rights are reserved. No part of this application or any of its code may be copied, modified, distributed, or used without the explicit written permission of the owner.
+This project is licensed under the GNU General Public License v3 - see the [LICENSE](LICENSE) file for details.
 
 Copyright © 2026 Syed Mahamudul Hasan (<mahamudulhasan.cse@gmail.com>). All rights reserved.
+
 
