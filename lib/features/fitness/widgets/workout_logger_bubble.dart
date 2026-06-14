@@ -179,13 +179,13 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                     final bool isDone = setItem['isCompleted'] ?? false;
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Row(
                         children: [
                           // Set number label
                           Container(
-                            width: 24,
-                            height: 24,
+                            width: 26,
+                            height: 26,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -206,89 +206,97 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
 
-                          // Weight adjustment: [-] 80.0 kg [+]
+                          // Adjusters stacked vertically to avoid horizontal overflow
                           Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _smallClickable(
-                                  icon: Icons.remove,
-                                  onTap: isDone
-                                      ? null
-                                      : () => _updateSetWeight(
-                                          exIndex,
-                                          setIdx,
-                                          -2.5,
-                                        ),
+                                // Weight adjuster Row
+                                Row(
+                                  children: [
+                                    const Icon(Icons.fitness_center_outlined, size: 12, color: AppColors.textMuted),
+                                    const SizedBox(width: 8),
+                                    _smallClickable(
+                                      icon: Icons.remove,
+                                      onTap: isDone
+                                          ? null
+                                          : () => _updateSetWeight(
+                                              exIndex,
+                                              setIdx,
+                                              -2.5,
+                                            ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${weight.toStringAsFixed(1)} kg',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDone
+                                            ? AppColors.textMuted
+                                            : AppColors.textPrimary,
+                                        decoration: isDone
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    _smallClickable(
+                                      icon: Icons.add,
+                                      onTap: isDone
+                                          ? null
+                                          : () => _updateSetWeight(
+                                              exIndex,
+                                              setIdx,
+                                              2.5,
+                                            ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${weight.toStringAsFixed(1)} kg',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDone
-                                        ? AppColors.textMuted
-                                        : AppColors.textPrimary,
-                                    decoration: isDone
-                                        ? TextDecoration.lineThrough
-                                        : null,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                _smallClickable(
-                                  icon: Icons.add,
-                                  onTap: isDone
-                                      ? null
-                                      : () => _updateSetWeight(
-                                          exIndex,
-                                          setIdx,
-                                          2.5,
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Reps adjustment: [-] 10 reps [+]
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _smallClickable(
-                                  icon: Icons.remove,
-                                  onTap: isDone
-                                      ? null
-                                      : () => _updateSetReps(
-                                          exIndex,
-                                          setIdx,
-                                          -1,
-                                        ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$reps reps',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDone
-                                        ? AppColors.textMuted
-                                        : AppColors.textPrimary,
-                                    decoration: isDone
-                                        ? TextDecoration.lineThrough
-                                        : null,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                _smallClickable(
-                                  icon: Icons.add,
-                                  onTap: isDone
-                                      ? null
-                                      : () => _updateSetReps(
-                                          exIndex,
-                                          setIdx,
-                                          1,
-                                        ),
+                                const SizedBox(height: 4),
+                                // Reps adjuster Row
+                                Row(
+                                  children: [
+                                    const Icon(Icons.repeat, size: 12, color: AppColors.textMuted),
+                                    const SizedBox(width: 8),
+                                    _smallClickable(
+                                      icon: Icons.remove,
+                                      onTap: isDone
+                                          ? null
+                                          : () => _updateSetReps(
+                                              exIndex,
+                                              setIdx,
+                                              -1,
+                                            ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '$reps reps',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDone
+                                            ? AppColors.textMuted
+                                            : AppColors.textPrimary,
+                                        decoration: isDone
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    _smallClickable(
+                                      icon: Icons.add,
+                                      onTap: isDone
+                                          ? null
+                                          : () => _updateSetReps(
+                                              exIndex,
+                                              setIdx,
+                                              1,
+                                            ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

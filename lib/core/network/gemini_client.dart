@@ -185,7 +185,14 @@ CRITICAL RULES:
           }
         }
       };
-    } else if (lowerPrompt.contains('eat') || lowerPrompt.contains('meal') || lowerPrompt.contains('food') || lowerPrompt.contains('calorie') || lowerPrompt.contains('macro')) {
+    } else if (lowerPrompt.contains('eat') ||
+        lowerPrompt.contains('meal') ||
+        lowerPrompt.contains('food') ||
+        lowerPrompt.contains('calorie') ||
+        lowerPrompt.contains('macro') ||
+        lowerPrompt.contains('shake') ||
+        lowerPrompt.contains('protein') ||
+        lowerPrompt.contains('portaine')) {
       String mealName = "Meal Tracked";
       int cal = 450;
       int protein = 25;
@@ -195,7 +202,9 @@ CRITICAL RULES:
       if (lowerPrompt.contains('banana')) {
         mealName = "Fresh Banana";
         cal = 105; protein = 1; carbs = 27; fat = 0;
-      } else if (lowerPrompt.contains('shake') || lowerPrompt.contains('protein')) {
+      } else if (lowerPrompt.contains('shake') ||
+          lowerPrompt.contains('protein') ||
+          lowerPrompt.contains('portaine')) {
         mealName = "Whey Protein Shake";
         cal = 160; protein = 30; carbs = 3; fat = 2;
       } else if (lowerPrompt.contains('chicken') || lowerPrompt.contains('rice')) {
