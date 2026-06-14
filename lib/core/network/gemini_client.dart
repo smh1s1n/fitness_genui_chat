@@ -68,6 +68,7 @@ CRITICAL RULES:
 1. Always respond in valid JSON. Do not include markdown code block wrapper (like ```json) in your actual response text; return ONLY the raw JSON string.
 2. If the user request is just generic conversation, set "widget": null.
 3. Be supportive and maintain a fitness coach persona.
+4. If the user provides height or weight in imperial units (e.g. inches, feet, lbs), you MUST convert them to metric (centimeters and kilograms) in the "bmi_calculator" widget data.
 ''';
 
   final String apiKey;
@@ -250,13 +251,50 @@ CRITICAL RULES:
         }
       };
     } else if (lowerPrompt.contains('bmi') || lowerPrompt.contains('weight') && lowerPrompt.contains('height') || lowerPrompt.contains('fat')) {
+      double heightCm = 180.0;
+      double weightKg = 75.0;
+
+      // Extract weight (e.g. "80 kg", "80kg", "170 lbs")
+      final RegExp weightRegExp = RegExp(r'(\d+(?:\.\d+)?)\s*(?:kg|kilogram|lbs|pound)');
+      final weightMatch = weightRegExp.firstMatch(lowerPrompt);
+      if (weightMatch != null) {
+        double parsedWeight = double.parse(weightMatch.group(1)!);
+        if (weightMatch.group(0)!.contains('lbs') || weightMatch.group(0)!.contains('pound')) {
+          parsedWeight = parsedWeight * 0.45359237; // Convert lbs to kg
+        }
+        weightKg = parsedWeight;
+      }
+
+      // Extract height (e.g. "66inch", "66 inches", "180cm", "5ft 10in", "5'10")
+      final RegExp cmMatchRegExp = RegExp(r'(\d+(?:\.\d+)?)\s*(?:cm|centimeter)');
+      final cmMatch = cmMatchRegExp.firstMatch(lowerPrompt);
+      if (cmMatch != null) {
+        heightCm = double.parse(cmMatch.group(1)!);
+      } else {
+        // Check inches (e.g. "66inch", "66 inches", "66 in")
+        final RegExp inchRegExp = RegExp(r'(\d+(?:\.\d+)?)\s*(?:inch|in\b)');
+        final inchMatch = inchRegExp.firstMatch(lowerPrompt);
+        if (inchMatch != null) {
+          heightCm = double.parse(inchMatch.group(1)!) * 2.54;
+        } else {
+          // Check feet/inches (e.g. "5ft 10in", "5'10", "5 feet 10 inches")
+          final RegExp feetRegExp = RegExp('(\\d+)\\s*(?:ft|feet|\')\\s*(\\d+)?\\s*(?:in|inch|")?');
+          final feetMatch = feetRegExp.firstMatch(lowerPrompt);
+          if (feetMatch != null) {
+            final double feet = double.parse(feetMatch.group(1)!);
+            final double inches = feetMatch.group(2) != null ? double.parse(feetMatch.group(2)!) : 0.0;
+            heightCm = ((feet * 12) + inches) * 2.54;
+          }
+        }
+      }
+
       return {
         "text": "Let's check your body metrics. Adjust your height and weight on the interactive BMI Calculator below to calculate your body mass index and see your fitness category.",
         "widget": {
           "type": "bmi_calculator",
           "data": {
-            "heightCm": 180.0,
-            "weightKg": 75.0
+            "heightCm": heightCm,
+            "weightKg": weightKg
           }
         }
       };
