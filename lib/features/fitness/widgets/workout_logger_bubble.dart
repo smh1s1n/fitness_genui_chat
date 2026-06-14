@@ -206,16 +206,28 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
 
-                          // Weight adjustment
+                          // Weight adjustment: [-] 80.0 kg [+]
                           Expanded(
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                _smallClickable(
+                                  icon: Icons.remove,
+                                  onTap: isDone
+                                      ? null
+                                      : () => _updateSetWeight(
+                                          exIndex,
+                                          setIdx,
+                                          -2.5,
+                                        ),
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   '${weight.toStringAsFixed(1)} kg',
                                   style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     color: isDone
                                         ? AppColors.textMuted
                                         : AppColors.textPrimary,
@@ -224,29 +236,10 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                                         : null,
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline,
-                                    size: 16,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: isDone
-                                      ? null
-                                      : () => _updateSetWeight(
-                                          exIndex,
-                                          setIdx,
-                                          -2.5,
-                                        ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.add_circle_outline,
-                                    size: 16,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: isDone
+                                const SizedBox(width: 4),
+                                _smallClickable(
+                                  icon: Icons.add,
+                                  onTap: isDone
                                       ? null
                                       : () => _updateSetWeight(
                                           exIndex,
@@ -258,15 +251,26 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                             ),
                           ),
 
-                          // Reps adjustment
+                          // Reps adjustment: [-] 10 reps [+]
                           Expanded(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                _smallClickable(
+                                  icon: Icons.remove,
+                                  onTap: isDone
+                                      ? null
+                                      : () => _updateSetReps(
+                                          exIndex,
+                                          setIdx,
+                                          -1,
+                                        ),
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   '$reps reps',
                                   style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     color: isDone
                                         ? AppColors.textMuted
                                         : AppColors.textPrimary,
@@ -275,29 +279,16 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
                                         : null,
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.remove_circle_outline,
-                                    size: 16,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: isDone
+                                const SizedBox(width: 4),
+                                _smallClickable(
+                                  icon: Icons.add,
+                                  onTap: isDone
                                       ? null
-                                      : () =>
-                                            _updateSetReps(exIndex, setIdx, -1),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.add_circle_outline,
-                                    size: 16,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: isDone
-                                      ? null
-                                      : () =>
-                                            _updateSetReps(exIndex, setIdx, 1),
+                                      : () => _updateSetReps(
+                                          exIndex,
+                                          setIdx,
+                                          1,
+                                        ),
                                 ),
                               ],
                             ),
@@ -328,6 +319,21 @@ class _WorkoutLoggerBubbleState extends ConsumerState<WorkoutLoggerBubble> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _smallClickable({required IconData icon, required VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Icon(
+          icon,
+          size: 14,
+          color: onTap == null ? AppColors.textMuted : AppColors.secondaryStart,
+        ),
       ),
     );
   }
